@@ -1,10 +1,9 @@
 pragma solidity ^0.4.11;
 
 
-import './ERC20Basic.sol';
-import '../ownership/Ownable.sol';
-import '../math/Math.sol';
-import '../math/SafeMath.sol';
+import './token/ERC20Basic.sol';
+import './ownership/Ownable.sol';
+import './math/SafeMath.sol';
 
 
 /**
@@ -28,6 +27,7 @@ contract TokenVesting is Ownable {
     // modifiers here
     modifier tokenSet() {
         require(address(token) != address(0));
+        _;
     }
 
     function setVestingToken(address token_address) onlyOwner {
