@@ -72,10 +72,9 @@ contract SLMICO is Pausable{
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 
-  function Crowdsale() {
+  function SLMICO() {
     token = createTokenContract();
   }
-
 
   //
   // Token related operations
