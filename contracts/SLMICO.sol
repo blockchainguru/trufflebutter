@@ -5,11 +5,11 @@ import './math/SafeMath.sol';
 import './lifecycle/Pausable.sol';
 
 /**
- * @title Crowdsale 
- * @dev Crowdsale is a base contract for managing a token crowdsale.
- * Crowdsales have a start and end timestamps, where investors can make
+ * @title SLMICO
+ * @dev SLMICO is a base contract for managing a token crowdsale.
+ * SLMICO have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet 
+ * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
 contract SLMICO is Pausable{
@@ -76,6 +76,11 @@ contract SLMICO is Pausable{
     token = createTokenContract();
   }
 
+
+  //
+  // Token related operations
+  //
+
   // creates the token to be sold. 
   // override this method to have crowdsale of a specific mintable token.
   function createTokenContract() internal returns (SLMToken) {
@@ -93,6 +98,11 @@ contract SLMICO is Pausable{
     require(token != address(0));
     token.pause(); 
   }
+
+
+  //
+  // Presale related operations
+  //
 
   // set total pre sale sold token
   // can not be changed once the ico is enabled
@@ -114,8 +124,15 @@ contract SLMICO is Pausable{
     token.transfer(beneficiary, tokens);
   }
 
+
+  //
+  // ICO related operations
+  //
+
   // set multisign wallet
   function setMultisignWallet(address _multisignWallet) onlyOwner{
+    // need to be set before the ico start
+    require(!icoEnabled || now < startTime);
     require(_multisignWallet != address(0));
     multisignWallet = _multisignWallet;
   }
@@ -157,6 +174,7 @@ contract SLMICO is Pausable{
 
     // calculate token amount to be created
     uint rate = getRate();
+    assert(rate > 0);
     uint256 tokens = weiAmount.mul(rate);
 
     uint256 newIcoSoldTokens = icoSoldTokens.add(tokens);
@@ -188,13 +206,14 @@ contract SLMICO is Pausable{
   function forwardFunds(uint256 weiAmount) internal {
     multisignWallet.transfer(weiAmount);
   }
-  
-  function transferUnsoldIcoTokens() onlyOwner { 
-    require(hasEnded());
-    require(icoSoldTokens < icoCap);
-    uint256 unsoldTokens = icoCap.sub(icoSoldTokens);
-    token.transfer(multisignWallet, unsoldTokens);
-  }
+
+  // unsold ico tokens transfer automatically in endIco
+  //function transferUnsoldIcoTokens() onlyOwner {
+  //  require(hasEnded());
+  //  require(icoSoldTokens < icoCap);
+  //  uint256 unsoldTokens = icoCap.sub(icoSoldTokens);
+  //  token.transfer(multisignWallet, unsoldTokens);
+  //}
 
   // @return true if the transaction can buy tokens
   function validPurchase() internal constant returns (bool) {
@@ -208,6 +227,11 @@ contract SLMICO is Pausable{
   function endIco() onlyOwner {
     require(!icoEnded);
     icoEnded = true;
+    //send all dao tokens to multiwallet
+    uint256 tokenToDao = tokensForFounder.add(tokensForDevteam).add(tokensForPartners).add(tokensForBounty).add(tokensForCharity);
+    uint256 unsoldTokens = icoCap.sub(icoSoldTokens);
+    tokenToDao.add(unsoldTokens);
+    multisignWallet.transfer(tokenToDao);
   }
 
   // @return true if crowdsale event has ended
@@ -231,6 +255,7 @@ contract SLMICO is Pausable{
       // no discount
       return 350;
     }
+    return 0;
   }
 
   // drain all eth for owner in an emergency situation
