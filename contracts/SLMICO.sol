@@ -3,6 +3,7 @@ pragma solidity ^0.4.11;
 import './SLMToken.sol';
 import './math/SafeMath.sol';
 import './lifecycle/Pausable.sol';
+import './TokenVesting.sol';
 
 /**
  * @title SLMICO
@@ -21,6 +22,9 @@ contract SLMICO is Pausable{
 
   // The token being sold
   SLMToken public token;
+
+  // The vesting contract
+  TokenVesting public vesting;
 
   // start and end timestamps where investments are allowed (both inclusive)
   uint256 public startTime;
@@ -72,8 +76,21 @@ contract SLMICO is Pausable{
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 
-  function SLMICO() {
+  function SLMICO(address _multisignWallet) {
     token = createTokenContract();
+    //send all dao tokens to multiwallet
+    uint256 tokensToDao = tokensForDevteam.add(tokensForPartners).add(tokensForBounty).add(tokensForCharity);
+    multisignWallet = _multisignWallet;
+    token.transfer(multisignWallet, tokensToDao);
+  }
+
+  function createVestingForFounder(address founderAddress) onlyOwner(){
+    require(address(vesting) == address(0));
+    vesting = createTokenVestingContract(address(token));
+    // create vesting schema for founders, total token amount is divided in 4 periods of 6 months each
+    vesting.createVestingByDurationAndSplits(founderAddress, tokensForFounder, now.add(1 days), 26 weeks, 4);
+    //send tokens to vesting contracts
+    token.transfer(address(vesting), tokensForFounder);
   }
 
   //
@@ -85,6 +102,13 @@ contract SLMICO is Pausable{
   function createTokenContract() internal returns (SLMToken) {
     return new SLMToken();
   }
+
+  // creates the token to be sold.
+  // override this method to have crowdsale of a specific mintable token.
+  function createTokenVestingContract(address tokenAddress) internal returns (TokenVesting) {
+    return new TokenVesting(tokenAddress);
+  }
+
 
   // enable token tranferability
   function enableTokenTransferability() onlyOwner {
@@ -136,6 +160,11 @@ contract SLMICO is Pausable{
     multisignWallet = _multisignWallet;
   }
 
+  // delegate vesting contract owner
+  function delegateVestingContractOwner(address newOwner) onlyOwner{
+    vesting.transferOwnership(newOwner);
+  }
+
   // set contribution dates
   function setContributionDates(uint256 _startTime, uint256 _endTime) onlyOwner{
     require(!icoEnabled);
@@ -151,7 +180,7 @@ contract SLMICO is Pausable{
   // startTime, endTime, soldPreSaleTokens
   function enableICO() onlyOwner{
     require(startTime >= now);
-    require(!icoEnabled);
+
     require(multisignWallet != address(0));
     icoEnabled = true;
     icoCap = initialICOCap.add(preSaleCap).sub(soldPreSaleTokens);
@@ -226,11 +255,9 @@ contract SLMICO is Pausable{
   function endIco() onlyOwner {
     require(!icoEnded);
     icoEnded = true;
-    //send all dao tokens to multiwallet
-    uint256 tokenToDao = tokensForFounder.add(tokensForDevteam).add(tokensForPartners).add(tokensForBounty).add(tokensForCharity);
+    // send unsold tokens to multi-sign wallet
     uint256 unsoldTokens = icoCap.sub(icoSoldTokens);
-    tokenToDao.add(unsoldTokens);
-    multisignWallet.transfer(tokenToDao);
+    multisignWallet.transfer(unsoldTokens);
   }
 
   // @return true if crowdsale event has ended

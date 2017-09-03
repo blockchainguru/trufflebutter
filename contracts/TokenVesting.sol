@@ -18,16 +18,21 @@ contract TokenVesting is Ownable {
     mapping (address => uint) totalVestedAmount;
 
     struct Vesting {
-    uint amount;
-    uint vestingDate;
+        uint amount;
+        uint vestingDate;
     }
 
+    address[] accountKeys;
     mapping (address => Vesting[]) public vestingAccounts;
 
     // modifiers here
     modifier tokenSet() {
         require(address(token) != address(0));
         _;
+    }
+
+   function TokenVesting(address token_address){
+        token = ERC20Basic(token_address);
     }
 
     function setVestingToken(address token_address) onlyOwner {
@@ -43,6 +48,9 @@ contract TokenVesting is Ownable {
         uint amount = total_amount.div(times);
         for (i = 0; i < times; i++) {
             vestingDate = vestingDate.add(durationPerVesting);
+            if (vestingAccounts[user].length == 0){
+                accountKeys.push(user);
+            }
             vestingAccounts[user].push(Vesting(amount, vestingDate));
         }
     }
@@ -65,10 +73,26 @@ contract TokenVesting is Ownable {
         return amount;
     }
 
+    function getAccountKeys(uint256 page) constant returns (address[10]){
+        address[10] memory accountList;
+        uint256 i;
+        for (i=0 + page * 10; i<10; i++){
+            if (i < accountKeys.length){
+                accountList[i - page * 10] = accountKeys[i];
+            }
+        }
+        return accountList;
+    }
+
     function vest() tokenSet {
         uint availableAmount = getAvailableVestingAmount(msg.sender);
         require(availableAmount > 0);
         totalVestedAmount[msg.sender] = totalVestedAmount[msg.sender].add(availableAmount);
         token.transfer(msg.sender, availableAmount);
+    }
+    // drain all eth for owner in an emergency situation
+    function drain() onlyOwner {
+        owner.transfer(this.balance);
+        token.transfer(owner, this.balance);
     }
 }
