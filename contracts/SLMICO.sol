@@ -257,7 +257,7 @@ contract SLMICO is Pausable{
     icoEnded = true;
     // send unsold tokens to multi-sign wallet
     uint256 unsoldTokens = icoCap.sub(icoSoldTokens);
-    multisignWallet.transfer(unsoldTokens);
+    token.transfer(multisignWallet, unsoldTokens);
   }
 
   // @return true if crowdsale event has ended
