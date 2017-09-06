@@ -12,7 +12,7 @@ import '../lifecycle/Pausable.sol';
 contract PausableToken is StandardToken, Pausable {
 
   /**
-   * @dev modifier to allow actions only when the contract IS paused or
+   * @dev modifier to allow actions only when the contract is not paused or
    * the sender is the owner of the contract
    */
   modifier whenNotPausedOrOwner() {
