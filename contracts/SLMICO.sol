@@ -195,6 +195,7 @@ contract SLMICO is Pausable{
   // low level token purchase function
   function buyTokens(address beneficiary) payable whenNotPaused {
     require(beneficiary != address(0));
+    require(msg.value >= minContribAmount);
     require(validPurchase());
 
     uint256 weiAmount = msg.value;
