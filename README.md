@@ -46,6 +46,22 @@ Contract to manage vesting
 - drain() owner of the contract can drain all eth and tokens in case of emergency
 
 
+# ICO Process
+For this ICO, here i list an example of possible sequence of actions to be taken.
+- 1. truffle migrate: create ICO contract along with Token contract and Vesting contract
+    -- states: your web3.eth.accounts[0] is the owner of the ICO contract and ICO contract is the owner of other 2 contracts
+- 2. setSoldPreSaleTokens: before the ico started, but preferible in the start, set the unsold token number, which will be transfered to the Multisign-wallet once the ico is enabled
+- 3. transferPreSaleTokens: afther the setSoldPreSaleTokens is executed, preferible inmediate after setSoldPreSaleTokens
+- 4. setMultisignWallet: optional, we have already set one in the contract creation, check the migration file, in case of changing it, must be before de ico started
+- 5. setContributionDates: set the parameters for ico, can be executed multiple times before enableICO is executed
+- 6. enableICO: enable ico and it is no way back.
+- 7. endIco, you need to manually end the ico to transfer unsold tokens to MultiSign-wallet
+- 8. delegateVestingContractOwner after *createVestingForFounder* is executed you can change the vesting contract owner, preferible after the ico 
+- 9. createVestingByDurationAndSplits: Anytime after the ico, keep in mind to transfer tokens in a seperated operation
 
+Operations which can be executed anytime:
+- createVestingForFounder
+- enableTokenTransferability/disableTokenTransferability
+- drain
 
 
