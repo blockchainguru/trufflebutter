@@ -66,6 +66,13 @@ contract SLMICO is Pausable{
   uint256 public icoSoldTokens; 
   bool public icoEnded = False;
 
+  //Sale rates
+  uint256 constant public RATE_FOR_DAY12 = 420;
+  uint256 constant public RATE_FOR_DAY34 = 385;
+  uint256 constant public RATE_FOR_DAY5 = 359;
+  uint256 constant public RATE_NO_DISCOUNT = 350;
+
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -271,15 +278,16 @@ contract SLMICO is Pausable{
     require(now >= startTime);
     if (now < startTime.add(2 days)){
       // day 1, day 2
-      return 420;
+      return RATE_FOR_DAY12;
     }else if (now < startTime.add(4 days)){
       // day 3, day 4
-      return 385;
+      return RATE_FOR_DAY34;
     }else if (now < startTime.add(5 days)){
       // day 5
-      return 359; 
+      return RATE_FOR_DAY5;
     }else if (now < endTime){
       // no discount
+      return RATE_NO_DISCOUNT;
       return 350;
     }
     return 0;
