@@ -6,7 +6,7 @@ contract SLMToken is PausableToken {
   string public name = "SLM";
   string public symbol = "SLM";
   uint256 public decimals = 18;
-  uint256 INITIAL_SUPPLY = 100000000 * (10**18);
+  uint256 INITIAL_SUPPLY = 100000000 * (10**decimals);
 
   function SLMToken() {
     // Set untransferable by default to the token

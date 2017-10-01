@@ -22,6 +22,7 @@ contract SLMICO is Pausable{
 
   // The token being sold
   SLMToken public token;
+  uint256 constant public tokenDecimals = 18;
 
   // The vesting contract
   TokenVesting public vesting;
@@ -40,21 +41,21 @@ contract SLMICO is Pausable{
   uint256 public weiRaised;
 
   // totalSupply
-  uint256 constant public totalSupply = 100000000 * (10 ** 18);
+  uint256 constant public totalSupply = 100000000 * (10 ** tokenDecimals);
   //pre sale cap
-  uint256 constant public preSaleCap = 10000000 * (10 ** 18);
+  uint256 constant public preSaleCap = 10000000 * (10 ** tokenDecimals);
   //sale cap
-  uint256 constant public initialICOCap = 60000000 * (10 ** 18);
+  uint256 constant public initialICOCap = 60000000 * (10 ** tokenDecimals);
   //founder share
-  uint256 constant public tokensForFounder = 10000000 * (10 ** 18);
+  uint256 constant public tokensForFounder = 10000000 * (10 ** tokenDecimals);
   //dev team share
-  uint256 constant public tokensForDevteam = 10000000 * (10 ** 18);
+  uint256 constant public tokensForDevteam = 10000000 * (10 ** tokenDecimals);
   //Partners share
-  uint256 constant public tokensForPartners = 5000000 * (10 ** 18);
+  uint256 constant public tokensForPartners = 5000000 * (10 ** tokenDecimals);
   //Charity share
-  uint256 constant public tokensForCharity = 3000000 * (10 ** 18);
+  uint256 constant public tokensForCharity = 3000000 * (10 ** tokenDecimals);
   //Bounty share
-  uint256 constant public tokensForBounty = 2000000 * (10 ** 18);
+  uint256 constant public tokensForBounty = 2000000 * (10 ** tokenDecimals);
     
   //Sold presale tokens
   uint256 public soldPreSaleTokens; 
