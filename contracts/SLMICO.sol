@@ -84,6 +84,7 @@ contract SLMICO is Pausable{
 
 
   function SLMICO(address _multisignWallet) {
+    require(_multisignWallet != address(0));
     token = createTokenContract();
     //send all dao tokens to multiwallet
     uint256 tokensToDao = tokensForDevteam.add(tokensForPartners).add(tokensForBounty).add(tokensForCharity);
@@ -92,6 +93,8 @@ contract SLMICO is Pausable{
   }
 
   function createVestingForFounder(address founderAddress) onlyOwner(){
+    require(founderAddress != address(0));
+    //create only once
     require(address(vesting) == address(0));
     vesting = createTokenVestingContract(address(token));
     // create vesting schema for founders, total token amount is divided in 4 periods of 6 months each
@@ -147,6 +150,7 @@ contract SLMICO is Pausable{
   // soldPreSaleTokens need to be set beforehand, and bigger than 0
   // the total amount to tranfered need to be less or equal to soldPreSaleTokens 
   function transferPreSaleTokens(uint256 tokens, address beneficiary) onlyOwner {
+    require(beneficiary != address(0));
     require(soldPreSaleTokens > 0);
     uint256 newSentPreSaleTokens = sentPreSaleTokens.add(tokens);
     require(newSentPreSaleTokens <= soldPreSaleTokens);
