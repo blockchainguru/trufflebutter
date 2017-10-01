@@ -56,7 +56,7 @@ contract TokenVesting is Ownable {
                 accountKeys.push(user);
             }
             vestingAccounts[user].push(Vesting(amount, vestingDate));
-            VestingCreated(user, amount, vestingDate)
+            VestingCreated(user, amount, vestingDate);
         }
     }
 

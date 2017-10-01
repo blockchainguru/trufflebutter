@@ -64,7 +64,7 @@ contract SLMICO is Pausable{
   //Is calcluated as: initialICOCap + preSaleCap - soldPreSaleTokens
   uint256 public icoCap; 
   uint256 public icoSoldTokens; 
-  bool public icoEnded = False;
+  bool public icoEnded = false;
 
   //Sale rates
   uint256 constant public RATE_FOR_DAY12 = 420;
