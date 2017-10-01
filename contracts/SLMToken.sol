@@ -3,9 +3,9 @@ pragma solidity ^0.4.11;
 import './token/PausableToken.sol';
 
 contract SLMToken is PausableToken {
-  string public name = "SLM";
-  string public symbol = "SLM";
-  uint256 public decimals = 18;
+  string constant public name = "SLM";
+  string constant public symbol = "SLM";
+  uint256 constant public decimals = 18;
   uint256 INITIAL_SUPPLY = 100000000 * (10**decimals);
 
   function SLMToken() {
