@@ -17,8 +17,7 @@ contract SLMICO is Pausable{
   using SafeMath for uint256;
 
   //Gas/GWei
-  uint public minContribAmount = 0.01 ether;
-  uint public maxGasPrice = 50000000000;
+  uint constant public minContribAmount = 0.01 ether;
 
   // The token being sold
   SLMToken public token;
@@ -65,7 +64,7 @@ contract SLMICO is Pausable{
   //Is calcluated as: initialICOCap + preSaleCap - soldPreSaleTokens
   uint256 public icoCap; 
   uint256 public icoSoldTokens; 
-  bool public icoEnded;
+  bool public icoEnded = False;
 
   /**
    * event for token purchase logging
@@ -211,7 +210,7 @@ contract SLMICO is Pausable{
 
     if (newIcoSoldTokens > icoCap) {
         newIcoSoldTokens = icoCap;
-        tokens = icoCap - icoSoldTokens;
+        tokens = icoCap.sub(icoSoldTokens);
         uint256 newWeiAmount = tokens.div(rate);
         returnWeiAmount = weiAmount.sub(newWeiAmount);
         weiAmount = newWeiAmount;
