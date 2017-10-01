@@ -258,7 +258,7 @@ contract SLMICO is Pausable{
   // @return true if the transaction can buy tokens
   function validPurchase() internal constant returns (bool) {
     bool withinPeriod = now >= startTime && now <= endTime;
-    bool nonZeroPurchase = msg.value != 0;
+    bool nonZeroPurchase = msg.value > 0;
     bool icoTokensAvailable = icoSoldTokens < icoCap;
     return !icoEnded && icoEnabled && withinPeriod && nonZeroPurchase && icoTokensAvailable;
   }
