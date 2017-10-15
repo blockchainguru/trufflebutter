@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.15;
 
 import './SLMToken.sol';
 import './math/SafeMath.sol';
@@ -25,6 +25,8 @@ contract SLMICO is Pausable{
 
   // The vesting contract
   TokenVesting public vesting;
+  uint256 constant public VESTING_TIMES = 4;
+  uint256 constant public DURATION_PER_VESTING = 26 weeks;
 
   // start and end timestamps where investments are allowed (both inclusive)
   uint256 public startTime;
@@ -98,7 +100,7 @@ contract SLMICO is Pausable{
     require(address(vesting) == address(0));
     vesting = createTokenVestingContract(address(token));
     // create vesting schema for founders, total token amount is divided in 4 periods of 6 months each
-    vesting.createVestingByDurationAndSplits(founderAddress, tokensForFounder, now.add(1 days), 26 weeks, 4);
+    vesting.createVestingByDurationAndSplits(founderAddress, tokensForFounder, now, DURATION_PER_VESTING, VESTING_TIMES);
     //send tokens to vesting contracts
     token.transfer(address(vesting), tokensForFounder);
   }
@@ -116,6 +118,7 @@ contract SLMICO is Pausable{
   // creates the token to be sold.
   // override this method to have crowdsale of a specific mintable token.
   function createTokenVestingContract(address tokenAddress) internal returns (TokenVesting) {
+    require(address(token) != address(0));
     return new TokenVesting(tokenAddress);
   }
 
@@ -206,7 +209,6 @@ contract SLMICO is Pausable{
   // low level token purchase function
   function buyTokens(address beneficiary) payable whenNotPaused {
     require(beneficiary != address(0));
-    require(msg.value >= minContribAmount);
     require(validPurchase());
 
     uint256 weiAmount = msg.value;
@@ -258,9 +260,9 @@ contract SLMICO is Pausable{
   // @return true if the transaction can buy tokens
   function validPurchase() internal constant returns (bool) {
     bool withinPeriod = now >= startTime && now <= endTime;
-    bool nonZeroPurchase = msg.value > 0;
+    bool nonMinimumPurchase = msg.value >= minContribAmount;
     bool icoTokensAvailable = icoSoldTokens < icoCap;
-    return !icoEnded && icoEnabled && withinPeriod && nonZeroPurchase && icoTokensAvailable;
+    return !icoEnded && icoEnabled && withinPeriod && nonMinimumPurchase && icoTokensAvailable;
   }
 
   // end ico by owner, not really needed in normal situation
@@ -292,7 +294,6 @@ contract SLMICO is Pausable{
     }else if (now < endTime){
       // no discount
       return RATE_NO_DISCOUNT;
-      return 350;
     }
     return 0;
   }
