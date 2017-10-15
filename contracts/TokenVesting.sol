@@ -39,11 +39,11 @@ contract TokenVesting is Ownable {
         token = ERC20Basic(token_address);
     }
 
-    function setVestingToken(address token_address) onlyOwner {
+    function setVestingToken(address token_address) external onlyOwner {
         token = ERC20Basic(token_address);
     }
 
-    function createVestingByDurationAndSplits(address user, uint total_amount, uint startDate, uint durationPerVesting, uint times) onlyOwner tokenSet {
+    function createVestingByDurationAndSplits(address user, uint total_amount, uint startDate, uint durationPerVesting, uint times) public onlyOwner tokenSet {
         uint256 vestingDate = startDate;
         uint i;
         require(startDate > now);
@@ -68,7 +68,7 @@ contract TokenVesting is Ownable {
                 amount = amount.add(vestingAccounts[user][i].amount);
             }
         }
-        return amount;
+
     }
 
     function getAvailableVestingAmount(address user) constant returns (uint){
@@ -78,7 +78,7 @@ contract TokenVesting is Ownable {
         return amount;
     }
 
-    function getAccountKeys(uint256 page) constant returns (address[10]){
+    function getAccountKeys(uint256 page) public constant returns (address[10]){
         address[10] memory accountList;
         uint256 i;
         for (i=0 + page * 10; i<10; i++){
@@ -89,7 +89,7 @@ contract TokenVesting is Ownable {
         return accountList;
     }
 
-    function vest() tokenSet {
+    function vest() external tokenSet {
         uint availableAmount = getAvailableVestingAmount(msg.sender);
         require(availableAmount > 0);
         totalVestedAmount[msg.sender] = totalVestedAmount[msg.sender].add(availableAmount);
@@ -97,7 +97,7 @@ contract TokenVesting is Ownable {
         Vest(msg.sender, availableAmount);
     }
     // drain all eth for owner in an emergency situation
-    function drain() onlyOwner {
+    function drain() external onlyOwner {
         owner.transfer(this.balance);
         token.transfer(owner, this.balance);
     }

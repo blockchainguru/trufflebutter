@@ -94,7 +94,7 @@ contract SLMICO is Pausable{
     token.transfer(multisignWallet, tokensToDao);
   }
 
-  function createVestingForFounder(address founderAddress) onlyOwner(){
+  function createVestingForFounder(address founderAddress) external onlyOwner(){
     require(founderAddress != address(0));
     //create only once
     require(address(vesting) == address(0));
@@ -124,13 +124,13 @@ contract SLMICO is Pausable{
 
 
   // enable token tranferability
-  function enableTokenTransferability() onlyOwner {
+  function enableTokenTransferability() external onlyOwner {
     require(token != address(0));
     token.unpause(); 
   }
 
   // disable token tranferability
-  function disableTokenTransferability() onlyOwner {
+  function disableTokenTransferability() external onlyOwner {
     require(token != address(0));
     token.pause(); 
   }
@@ -143,7 +143,7 @@ contract SLMICO is Pausable{
   // set total pre sale sold token
   // can not be changed once the ico is enabled
   // Ico cap is determined by SaleCap + PreSaleCap - soldPreSaleTokens 
-  function setSoldPreSaleTokens(uint256 _soldPreSaleTokens) onlyOwner{
+  function setSoldPreSaleTokens(uint256 _soldPreSaleTokens) external onlyOwner{
     require(!icoEnabled);
     require(_soldPreSaleTokens <= preSaleCap);
     soldPreSaleTokens = _soldPreSaleTokens;
@@ -152,7 +152,7 @@ contract SLMICO is Pausable{
   // transfer pre sale tokend to investors
   // soldPreSaleTokens need to be set beforehand, and bigger than 0
   // the total amount to tranfered need to be less or equal to soldPreSaleTokens 
-  function transferPreSaleTokens(uint256 tokens, address beneficiary) onlyOwner {
+  function transferPreSaleTokens(uint256 tokens, address beneficiary) external onlyOwner {
     require(beneficiary != address(0));
     require(soldPreSaleTokens > 0);
     uint256 newSentPreSaleTokens = sentPreSaleTokens.add(tokens);
@@ -167,7 +167,7 @@ contract SLMICO is Pausable{
   //
 
   // set multisign wallet
-  function setMultisignWallet(address _multisignWallet) onlyOwner{
+  function setMultisignWallet(address _multisignWallet) external onlyOwner{
     // need to be set before the ico start
     require(!icoEnabled || now < startTime);
     require(_multisignWallet != address(0));
@@ -175,12 +175,12 @@ contract SLMICO is Pausable{
   }
 
   // delegate vesting contract owner
-  function delegateVestingContractOwner(address newOwner) onlyOwner{
+  function delegateVestingContractOwner(address newOwner) external onlyOwner{
     vesting.transferOwnership(newOwner);
   }
 
   // set contribution dates
-  function setContributionDates(uint256 _startTime, uint256 _endTime) onlyOwner{
+  function setContributionDates(uint256 _startTime, uint256 _endTime) external onlyOwner{
     require(!icoEnabled);
     require(_startTime >= now);
     require(_endTime >= _startTime);
@@ -192,7 +192,7 @@ contract SLMICO is Pausable{
   // multisign wallet need to be set, because once ico started, invested funds is transfered to this address
   // once ico is enabled, following parameters can not be changed anymore:
   // startTime, endTime, soldPreSaleTokens
-  function enableICO() onlyOwner{
+  function enableICO() external onlyOwner{
     require(startTime >= now);
 
     require(multisignWallet != address(0));
@@ -207,7 +207,7 @@ contract SLMICO is Pausable{
   }
 
   // low level token purchase function
-  function buyTokens(address beneficiary) payable whenNotPaused {
+  function buyTokens(address beneficiary) public payable whenNotPaused {
     require(beneficiary != address(0));
     require(validPurchase());
 
@@ -266,7 +266,7 @@ contract SLMICO is Pausable{
   }
 
   // end ico by owner, not really needed in normal situation
-  function endIco() onlyOwner {
+  function endIco() external onlyOwner {
     require(!icoEnded);
     icoEnded = true;
     // send unsold tokens to multi-sign wallet
@@ -299,7 +299,7 @@ contract SLMICO is Pausable{
   }
 
   // drain all eth for owner in an emergency situation
-  function drain() onlyOwner {
+  function drain() external onlyOwner {
     owner.transfer(this.balance);
   }
 }
