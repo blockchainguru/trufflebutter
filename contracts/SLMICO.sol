@@ -99,7 +99,7 @@ contract SLMICO is Pausable{
     //create only once
     require(address(vesting) == address(0));
     vesting = createTokenVestingContract(address(token));
-    // create vesting schema for founders, total token amount is divided in 4 periods of 6 months each
+    // create vesting schema for founders from now, total token amount is divided in 4 periods of 6 months each
     vesting.createVestingByDurationAndSplits(founderAddress, tokensForFounder, now, DURATION_PER_VESTING, VESTING_TIMES);
     //send tokens to vesting contracts
     token.transfer(address(vesting), tokensForFounder);
