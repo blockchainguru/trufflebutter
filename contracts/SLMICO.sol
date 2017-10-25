@@ -69,9 +69,9 @@ contract SLMICO is Pausable{
   bool public icoEnded = false;
 
   //Sale rates
-  uint256 constant public RATE_FOR_DAY12 = 420;
-  uint256 constant public RATE_FOR_DAY34 = 385;
-  uint256 constant public RATE_FOR_DAY5 = 359;
+  uint256 constant public RATE_FOR_WEEK1 = 420;
+  uint256 constant public RATE_FOR_WEEK2 = 385;
+  uint256 constant public RATE_FOR_WEEK3 = 359;
   uint256 constant public RATE_NO_DISCOUNT = 350;
 
 
@@ -282,15 +282,15 @@ contract SLMICO is Pausable{
 
   function getRate() public constant returns(uint){
     require(now >= startTime);
-    if (now < startTime.add(2 days)){
-      // day 1, day 2
-      return RATE_FOR_DAY12;
-    }else if (now < startTime.add(4 days)){
-      // day 3, day 4
-      return RATE_FOR_DAY34;
-    }else if (now < startTime.add(5 days)){
-      // day 5
-      return RATE_FOR_DAY5;
+    if (now < startTime.add(1 weeks)){
+      // week 1
+      return RATE_FOR_WEEK1;
+    }else if (now < startTime.add(2 weeks)){
+      // week 2
+      return RATE_FOR_WEEK2;
+    }else if (now < startTime.add(3 weeks)){
+      // week 3
+      return RATE_FOR_WEEK3;
     }else if (now < endTime){
       // no discount
       return RATE_NO_DISCOUNT;
