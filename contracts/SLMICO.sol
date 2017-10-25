@@ -240,13 +240,13 @@ contract SLMICO is Pausable{
 
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
-    forwardFunds(weiAmount);
+    forwardFunds();
   }
 
   // send ether to the fund collection wallet
   // override to create custom fund forwarding mechanisms
-  function forwardFunds(uint256 weiAmount) internal {
-    multisignWallet.transfer(weiAmount);
+  function forwardFunds() internal {
+    multisignWallet.transfer(this.balance);
   }
 
   // unsold ico tokens transfer automatically in endIco
